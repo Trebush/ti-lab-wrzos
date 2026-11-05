@@ -3,6 +3,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -56,7 +60,8 @@ section {
     margin-bottom: 50px;
 }
 
-h1, h2 {
+h1,
+h2 {
     color: #192d29;
 }
 
@@ -105,6 +110,36 @@ h1, h2 {
     font-size: 13px;
 }
 
+.price-table {
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.price-table th,
+.price-table td {
+    padding: 15px;
+    border: 1px solid #dce5df;
+    text-align: left;
+}
+
+.price-table th {
+    background-color: #192d29;
+    color: white;
+}
+
+.price-table tbody tr:nth-child(even) {
+    background-color: #f1f7f3;
+}
+
+.price-table .num {
+    text-align: right;
+    white-space: nowrap;
+}
+
 footer {
     padding: 30px;
     background-color: #192d29;
@@ -114,6 +149,21 @@ footer {
 
 footer h2 {
     color: white;
+}
+
+footer a {
+    color: #a5e5b5;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+footer a:hover {
+    color: white;
+}
+
+footer a:focus-visible {
+    outline: 2px solid #a5e5b5;
+    outline-offset: 4px;
 }
 
 @media (max-width: 600px) {
@@ -139,5 +189,10 @@ footer h2 {
 
     .card {
         flex-basis: auto;
+    }
+
+    .price-table th,
+    .price-table td {
+        padding: 10px;
     }
 }
