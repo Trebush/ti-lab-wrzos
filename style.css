@@ -35,6 +35,28 @@ body {
     gap: 24px;
 }
 
+.menu-toggle {
+    display: none;
+    padding: 10px 20px;
+    border: 2px solid #8ee0ad;
+    border-radius: 5px;
+    background-color: #192d29;
+    color: white;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menu-toggle:hover {
+    background-color: #8ee0ad;
+    color: #192d29;
+}
+
+.menu-toggle:focus-visible {
+    outline: 2px solid #8ee0ad;
+    outline-offset: 4px;
+}
+
 .menu a {
     color: white;
     text-decoration: none;
@@ -173,10 +195,19 @@ footer a:focus-visible {
         padding: 20px;
     }
 
+    .menu-toggle {
+        display: block;
+    }
+
     .menu {
+        display: none;
         flex-direction: column;
         align-items: center;
         gap: 10px;
+    }
+
+    .menu.menu--open {
+        display: flex;
     }
 
     main {

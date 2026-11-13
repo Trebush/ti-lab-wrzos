@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Szprycha - serwis rowerowy</title>
     <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
 </head>
 <body>
 
     <header class="site-header">
         <p class="logo">Szprycha</p>
 
-        <nav class="menu">
+        <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false">Menu</button>
+        <nav class="menu" id="menu">
             <a href="#uslugi">Usługi</a>
             <a href="#cennik">Cennik</a>
             <a href="#kontakt">Kontakt</a>
