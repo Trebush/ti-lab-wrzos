@@ -181,6 +181,41 @@ h2 {
     white-space: nowrap;
 }
 
+.greeting {
+    overflow-wrap: anywhere;
+}
+
+.price-chart {
+    max-width: 600px;
+    margin: 24px 0 0;
+    padding: 16px;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.price-chart figcaption {
+    margin-bottom: 16px;
+    color: #192d29;
+    font-weight: bold;
+}
+
+.price-chart svg {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+}
+
+.price-chart text {
+    fill: #26352c;
+    font: 16px Arial, sans-serif;
+}
+
+.price-chart rect {
+    fill: #23834a;
+}
+
 footer {
     padding: 30px;
     background-color: #192d29;

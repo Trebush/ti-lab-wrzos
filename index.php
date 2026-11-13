@@ -1,12 +1,19 @@
 <?php
 $firma = 'Szprycha';
 $rok = date('Y');
+$imie = $_GET['imie'] ?? '';
+$imie = is_string($imie) ? trim($imie) : '';
+$imie = $imie !== '' ? $imie : 'Gościu';
 $cennik = [
     ['nazwa' => 'Regulacja hamulców', 'cena' => 50],
     ['nazwa' => 'Przegląd roweru', 'cena' => 120],
     ['nazwa' => 'Serwis napędu', 'cena' => 90],
     ['nazwa' => 'Centrowanie koła', 'cena' => 60]
 ];
+$maksymalnaCena = 1;
+foreach ($cennik as $usluga) {
+    $maksymalnaCena = max($maksymalnaCena, $usluga['cena']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -45,6 +52,7 @@ $cennik = [
     <main>
         <section id="uslugi">
             <h1>Serwis rowerowy Szprycha</h1>
+            <p class="greeting">Cześć, <?= htmlspecialchars($imie, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>!</p>
             <h2>Nasze usługi</h2>
 
             <div class="cards">
@@ -88,6 +96,20 @@ $cennik = [
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <figure class="price-chart">
+                <figcaption>Porównanie cen usług</figcaption>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 <?= max(1, count($cennik)) * 76 ?>" role="img" aria-labelledby="wykres-tytul wykres-opis">
+                    <title id="wykres-tytul">Ceny usług Szprychy</title>
+                    <desc id="wykres-opis">Długości zielonych słupków odpowiadają cenom początkowym usług. Najdłuższy słupek oznacza najwyższą cenę. Dokładne kwoty podano również w tabeli powyżej.</desc>
+                    <?php foreach ($cennik as $indeks => $usluga): ?>
+                    <g transform="translate(0 <?= $indeks * 76 ?>)">
+                        <text x="0" y="20"><?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></text>
+                        <rect x="0" y="32" width="<?= $usluga['cena'] / $maksymalnaCena * 200 ?>" height="24" rx="3" />
+                        <text x="210" y="49">od <?= $usluga['cena'] ?> zł</text>
+                    </g>
+                    <?php endforeach; ?>
+                </svg>
+            </figure>
         </section>
     </main>
 
