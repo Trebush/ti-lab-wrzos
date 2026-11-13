@@ -24,10 +24,29 @@ body {
 }
 
 .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     margin: 0;
     font-size: 28px;
     font-weight: bold;
     color: white;
+    text-decoration: none;
+}
+
+.logo svg {
+    display: block;
+    flex-shrink: 0;
+    color: #8ee0ad;
+}
+
+.logo:hover {
+    color: #8ee0ad;
+}
+
+.logo:focus-visible {
+    outline: 2px solid #8ee0ad;
+    outline-offset: 4px;
 }
 
 .menu {

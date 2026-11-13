@@ -20,7 +20,19 @@ $cennik = [
 <body>
 
     <header class="site-header">
-        <p class="logo">Szprycha</p>
+        <a class="logo" href="#" aria-label="Szprycha — początek strony">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 64" width="72" height="38" role="img" aria-labelledby="logo-tytul" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <title id="logo-tytul">Szprycha</title>
+                <circle cx="28" cy="42" r="18" />
+                <circle cx="92" cy="42" r="18" />
+                <polyline points="28,42 44,18 60,42 28,42" />
+                <polyline points="44,18 82,18 60,42" />
+                <polyline points="92,42 80,10 92,10" />
+                <polyline points="38,14 50,14" />
+                <polyline points="44,14 44,18" />
+            </svg>
+            <span>Szprycha</span>
+        </a>
 
         <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false">Menu</button>
         <nav class="menu" id="menu">
