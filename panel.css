@@ -1,0 +1,40 @@
+.panel {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 24px;
+    background-color: white;
+    border: 1px solid #dce5df;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+
+.panel form {
+    display: grid;
+    gap: 12px;
+}
+
+.panel input,
+.panel button {
+    min-width: 0;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #23834a;
+    border-radius: 5px;
+    font: inherit;
+}
+
+.panel button {
+    margin-top: 8px;
+    background-color: #192d29;
+    color: white;
+    cursor: pointer;
+}
+
+.panel button:hover {
+    background-color: #23834a;
+}
+
+.panel :focus-visible {
+    outline: 2px solid #23834a;
+    outline-offset: 3px;
+}
