@@ -4,12 +4,8 @@ $rok = date('Y');
 $imie = $_GET['imie'] ?? '';
 $imie = is_string($imie) ? trim($imie) : '';
 $imie = $imie !== '' ? $imie : 'Gościu';
-$cennik = [
-    ['nazwa' => 'Regulacja hamulców', 'cena' => 50],
-    ['nazwa' => 'Przegląd roweru', 'cena' => 120],
-    ['nazwa' => 'Serwis napędu', 'cena' => 90],
-    ['nazwa' => 'Centrowanie koła', 'cena' => 60]
-];
+require __DIR__ . '/baza.php';
+$cennik = $pdo->query('SELECT id, nazwa, cena, popularnosc FROM uslugi ORDER BY id')->fetchAll();
 $maksymalnaCena = 1;
 foreach ($cennik as $usluga) {
     $maksymalnaCena = max($maksymalnaCena, $usluga['cena']);
