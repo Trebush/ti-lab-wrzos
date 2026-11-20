@@ -13,6 +13,16 @@
     gap: 12px;
 }
 
+.panel .price-table {
+    table-layout: fixed;
+}
+
+.panel .price-table .num {
+    width: 40%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 .panel input,
 .panel button {
     min-width: 0;
