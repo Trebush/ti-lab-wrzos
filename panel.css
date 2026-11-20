@@ -1,50 +1,51 @@
+body {
+    background-color: #f4f7f5;
+    color: #26352c;
+}
+
+h1,
+h2 {
+    color: #192d29;
+}
+
+.navbar {
+    background-color: #192d29;
+}
+
 .panel {
     max-width: 480px;
-    margin: 40px auto;
-    padding: 24px;
+    margin: 16px auto;
     background-color: white;
     border: 1px solid #dce5df;
     border-radius: 10px;
-    overflow-wrap: anywhere;
 }
 
-.panel form {
+.panel-form {
     display: grid;
     gap: 12px;
 }
 
-.panel .price-table {
-    table-layout: fixed;
+.panel-form .form-label {
+    margin-bottom: 0;
 }
 
-.panel .price-table .num {
-    width: 40%;
-    white-space: normal;
+.form-control:focus {
+    border-color: #23834a;
+    box-shadow: 0 0 0 0.25rem rgba(35, 131, 74, 0.2);
+}
+
+.btn-primary {
+    --bs-btn-bg: #192d29;
+    --bs-btn-border-color: #192d29;
+    --bs-btn-hover-bg: #23834a;
+    --bs-btn-hover-border-color: #23834a;
+    --bs-btn-active-bg: #23834a;
+    --bs-btn-active-border-color: #23834a;
+    --bs-btn-focus-shadow-rgb: 35, 131, 74;
+}
+
+.service-table td:first-child,
+.service-table th:first-child {
+    min-width: 120px;
     overflow-wrap: anywhere;
-}
-
-.panel input,
-.panel button {
-    min-width: 0;
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #23834a;
-    border-radius: 5px;
-    font: inherit;
-}
-
-.panel button {
-    margin-top: 8px;
-    background-color: #192d29;
-    color: white;
-    cursor: pointer;
-}
-
-.panel button:hover {
-    background-color: #23834a;
-}
-
-.panel :focus-visible {
-    outline: 2px solid #23834a;
-    outline-offset: 3px;
 }

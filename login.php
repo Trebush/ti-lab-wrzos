@@ -35,23 +35,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logowanie — Szprycha</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="panel.css">
 </head>
 <body>
-    <main class="panel">
+    <main class="container py-4">
+        <div class="panel p-4">
         <h1>Logowanie administratora</h1>
         <?php if ($blad !== ''): ?>
-        <p role="alert"><?= htmlspecialchars($blad, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
+        <p class="alert alert-danger" role="alert"><?= htmlspecialchars($blad, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
         <?php endif; ?>
-        <form method="post" action="login.php">
+        <form method="post" action="login.php" class="panel-form">
             <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-            <label for="login">Login</label>
-            <input id="login" name="login" autocomplete="username" required value="<?= htmlspecialchars($login, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
-            <label for="haslo">Hasło</label>
-            <input id="haslo" name="haslo" type="password" autocomplete="current-password" required>
-            <button type="submit">Zaloguj</button>
+            <label class="form-label" for="login">Login</label>
+            <input class="form-control" id="login" name="login" autocomplete="username" required value="<?= htmlspecialchars($login, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+            <label class="form-label" for="haslo">Hasło</label>
+            <input class="form-control" id="haslo" name="haslo" type="password" autocomplete="current-password" required>
+            <button type="submit" class="btn btn-primary">Zaloguj</button>
         </form>
+    </div>
     </main>
 </body>
 </html>

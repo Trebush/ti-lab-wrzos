@@ -10,7 +10,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cena = is_string($_POST['cena'] ?? null) ? $_POST['cena'] : '';
     $token = is_string($_POST['csrf'] ?? null) ? $_POST['csrf'] : '';
     $cenaLiczbowa = filter_var($cena, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    if (($_POST['akcja'] ?? '') !== 'dodaj' || !hash_equals($_SESSION['csrf'], $token)) {
+    $akcja = $_POST['akcja'] ?? '';
+    if (!hash_equals($_SESSION['csrf'], $token)) {
+        $blad = 'Nieprawidłowe żądanie. Spróbuj ponownie.';
+    } elseif ($akcja === 'usun') {
+        $id = is_string($_POST['id'] ?? null)
+            ? filter_var($_POST['id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
+        if ($id === false) {
+            $blad = 'Identyfikator usługi musi być liczbą całkowitą większą od zera.';
+        } else {
+            $zapytanie = $pdo->prepare('DELETE FROM uslugi WHERE id = :id');
+            $zapytanie->execute(['id' => $id]);
+            if ($zapytanie->rowCount() === 1) {
+                header('Location: admin.php?ok=usunieto');
+                exit;
+            }
+            $blad = 'Nie znaleziono wskazanej usługi.';
+        }
+    } elseif ($akcja !== 'dodaj') {
         $blad = 'Nieprawidłowe żądanie. Spróbuj ponownie.';
     } elseif ($nazwa === '' || !mb_check_encoding($nazwa, 'UTF-8') || mb_strlen($nazwa, 'UTF-8') > 100) {
         $blad = 'Nazwa usługi musi zawierać od 1 do 100 znaków.';
@@ -31,54 +49,73 @@ $uslugi = $pdo->query('SELECT id, nazwa, cena FROM uslugi ORDER BY nazwa')->fetc
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel administratora — Szprycha</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="panel.css">
 </head>
 <body>
-    <main class="panel">
+    <nav class="navbar navbar-dark" aria-label="Nawigacja panelu">
+        <div class="container gap-3">
+            <a class="navbar-brand" href="index.php">Szprycha</a>
+            <form method="post" action="wyloguj.php">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                <button type="submit" class="btn btn-outline-light">Wyloguj</button>
+            </form>
+        </div>
+    </nav>
+    <main class="container py-4">
         <h1>Panel administratora</h1>
         <p>Witaj, <?= htmlspecialchars($_SESSION['uzytkownik'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
         <?php if ($blad !== ''): ?>
-        <p role="alert"><?= htmlspecialchars($blad, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
+        <p class="alert alert-danger" role="alert"><?= htmlspecialchars($blad, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
         <?php elseif (($_GET['ok'] ?? '') === 'dodano'): ?>
-        <p role="status">Usługa dodana.</p>
+        <p class="alert alert-success" role="status">Usługa dodana.</p>
+        <?php elseif (($_GET['ok'] ?? '') === 'usunieto'): ?>
+        <p class="alert alert-success" role="status">Usługa usunięta.</p>
         <?php endif; ?>
-        <section aria-labelledby="lista-uslug">
+        <div class="row g-4">
+        <section class="col-lg-8" aria-labelledby="lista-uslug">
             <h2 id="lista-uslug">Usługi</h2>
             <?php if ($uslugi === []): ?>
-            <p>Brak usług w bazie.</p>
+            <p class="alert alert-info">Brak usług w bazie.</p>
             <?php else: ?>
-            <table class="price-table">
+            <div class="table-responsive">
+            <table class="table table-striped align-middle service-table">
                 <thead>
-                    <tr><th scope="col">Nazwa usługi</th><th scope="col" class="num">Cena</th></tr>
+                    <tr><th scope="col">Nazwa usługi</th><th scope="col" class="text-end">Cena</th><th scope="col">Akcje</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($uslugi as $usluga): ?>
                     <tr>
                         <td><?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
-                        <td class="num"><?= htmlspecialchars((string) $usluga['cena'], ENT_QUOTES, 'UTF-8') ?> zł</td>
+                        <td class="text-end text-nowrap"><?= htmlspecialchars((string) $usluga['cena'], ENT_QUOTES, 'UTF-8') ?> zł</td>
+                        <td>
+                            <form method="post" action="admin.php" class="d-inline">
+                                <input type="hidden" name="akcja" value="usun">
+                                <input type="hidden" name="id" value="<?= (int) $usluga['id'] ?>">
+                                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Usuń usługę: <?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">Usuń</button>
+                            </form>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <?php endif; ?>
         </section>
-        <section aria-labelledby="dodaj-usluge">
+        <section class="col-lg-4" aria-labelledby="dodaj-usluge">
             <h2 id="dodaj-usluge">Dodaj usługę</h2>
-            <form method="post" action="admin.php">
+            <form method="post" action="admin.php" class="panel-form">
                 <input type="hidden" name="akcja" value="dodaj">
                 <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-                <label for="nazwa">Nazwa usługi</label>
-                <input id="nazwa" name="nazwa" required maxlength="100" value="<?= htmlspecialchars($nazwa, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
-                <label for="cena">Cena (zł)</label>
-                <input id="cena" name="cena" type="number" required min="1" step="1" value="<?= htmlspecialchars($cena, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
-                <button type="submit">Dodaj</button>
+                <label class="form-label" for="nazwa">Nazwa usługi</label>
+                <input class="form-control" id="nazwa" name="nazwa" required maxlength="100" value="<?= htmlspecialchars($nazwa, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                <label class="form-label" for="cena">Cena (zł)</label>
+                <input class="form-control" id="cena" name="cena" type="number" required min="1" step="1" value="<?= htmlspecialchars($cena, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                <button type="submit" class="btn btn-primary">Dodaj</button>
             </form>
         </section>
-        <form method="post" action="wyloguj.php">
-            <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-            <button type="submit">Wyloguj</button>
-        </form>
+        </div>
     </main>
 </body>
 </html>
