@@ -185,6 +185,45 @@ h2 {
     overflow-wrap: anywhere;
 }
 
+.price-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.price-filter input,
+.price-filter button {
+    min-width: 0;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #23834a;
+    border-radius: 5px;
+    font: inherit;
+}
+
+.price-filter button {
+    background-color: #192d29;
+    color: white;
+    cursor: pointer;
+}
+
+.price-filter button:hover {
+    background-color: #23834a;
+}
+
+.price-filter a {
+    color: #192d29;
+    text-underline-offset: 3px;
+}
+
+.price-filter :focus-visible {
+    outline: 2px solid #23834a;
+    outline-offset: 3px;
+}
+
 .price-chart {
     max-width: 600px;
     margin: 24px 0 0;

@@ -6,8 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$token = is_string($_POST['csrf'] ?? null) ? $_POST['csrf'] : '';
-if (!isset($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], $token)) {
+if (!csrf_poprawny()) {
     http_response_code(403);
     exit('Nieprawidłowe żądanie.');
 }

@@ -5,10 +5,28 @@ $imie = $_GET['imie'] ?? '';
 $imie = is_string($imie) ? trim($imie) : '';
 $imie = $imie !== '' ? $imie : 'Gościu';
 require __DIR__ . '/baza.php';
-$cennik = $pdo->query('SELECT id, nazwa, cena, popularnosc FROM uslugi ORDER BY id')->fetchAll();
-$maksymalnaCena = 1;
+$max = $_GET['max'] ?? '';
+$bladFiltra = '';
+$limitCeny = null;
+if ($max !== '') {
+    $limitCeny = is_string($max)
+        ? filter_var($max, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])
+        : false;
+    if ($limitCeny === false) {
+        $bladFiltra = 'Maksymalna cena musi być nieujemną liczbą całkowitą.';
+    }
+}
+if ($limitCeny !== null && $limitCeny !== false) {
+    $zapytanie = $pdo->prepare('SELECT id, nazwa, cena, popularnosc FROM uslugi WHERE cena <= :max ORDER BY cena');
+    $zapytanie->execute(['max' => $limitCeny]);
+    $cennik = $zapytanie->fetchAll();
+} else {
+    $cennik = $pdo->query('SELECT id, nazwa, cena, popularnosc FROM uslugi ORDER BY id')->fetchAll();
+}
+$adresBezFiltra = 'index.php' . (is_string($_GET['imie'] ?? null) ? '?imie=' . rawurlencode($_GET['imie']) : '') . '#cennik';
+$maksymalnaPopularnosc = 0;
 foreach ($cennik as $usluga) {
-    $maksymalnaCena = max($maksymalnaCena, $usluga['cena']);
+    $maksymalnaPopularnosc = max($maksymalnaPopularnosc, $usluga['popularnosc']);
 }
 ?>
 <!DOCTYPE html>
@@ -75,7 +93,21 @@ foreach ($cennik as $usluga) {
 
         <section id="cennik">
             <h2>Cennik</h2>
-
+            <form class="price-filter" method="get" action="index.php#cennik">
+                <?php if (is_string($_GET['imie'] ?? null)): ?>
+                <input type="hidden" name="imie" value="<?= htmlspecialchars($_GET['imie'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                <?php endif; ?>
+                <label for="max">Maksymalna cena (zł)</label>
+                <input id="max" name="max" type="number" min="0" step="1" value="<?= htmlspecialchars(is_string($max) ? $max : '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"<?= $bladFiltra !== '' ? ' aria-invalid="true" aria-describedby="blad-filtra"' : '' ?>>
+                <button type="submit">Filtruj</button>
+                <a href="<?= htmlspecialchars($adresBezFiltra, ENT_QUOTES, 'UTF-8') ?>">Wyczyść filtr</a>
+            </form>
+            <?php if ($bladFiltra !== ''): ?>
+            <p id="blad-filtra" role="alert"><?= htmlspecialchars($bladFiltra, ENT_QUOTES, 'UTF-8') ?> Wyświetlono wszystkie usługi.</p>
+            <?php endif; ?>
+            <?php if ($cennik === []): ?>
+            <p>Brak usług spełniających podane kryteria.</p>
+            <?php endif; ?>
             <table class="price-table">
                 <thead>
                     <tr>
@@ -93,15 +125,19 @@ foreach ($cennik as $usluga) {
                 </tbody>
             </table>
             <figure class="price-chart">
-                <figcaption>Porównanie cen usług</figcaption>
+                <figcaption>Popularność usług</figcaption>
+                <p>Wykres obejmuje usługi widoczne w cenniku.</p>
+                <?php if ($cennik !== [] && $maksymalnaPopularnosc == 0): ?>
+                <p>Brak danych o popularności — wszystkie wartości wynoszą 0.</p>
+                <?php endif; ?>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 <?= max(1, count($cennik)) * 76 ?>" role="img" aria-labelledby="wykres-tytul wykres-opis">
-                    <title id="wykres-tytul">Ceny usług Szprychy</title>
-                    <desc id="wykres-opis">Długości zielonych słupków odpowiadają cenom początkowym usług. Najdłuższy słupek oznacza najwyższą cenę. Dokładne kwoty podano również w tabeli powyżej.</desc>
+                    <title id="wykres-tytul">Popularność usług Szprychy</title>
+                    <desc id="wykres-opis">Długości zielonych słupków odpowiadają popularności usług widocznych w cenniku. Najdłuższy słupek oznacza największą popularność. Przy każdej usłudze podano jej wartość.</desc>
                     <?php foreach ($cennik as $indeks => $usluga): ?>
                     <g transform="translate(0 <?= $indeks * 76 ?>)">
                         <text x="0" y="20"><?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></text>
-                        <rect x="0" y="32" width="<?= $usluga['cena'] / $maksymalnaCena * 200 ?>" height="24" rx="3" />
-                        <text x="210" y="49">od <?= $usluga['cena'] ?> zł</text>
+                        <rect x="0" y="32" width="<?= max(0, $usluga['popularnosc']) / max(1, $maksymalnaPopularnosc) * 200 ?>" height="24" rx="3" />
+                        <text x="210" y="49"><?= (int) $usluga['popularnosc'] ?></text>
                     </g>
                     <?php endforeach; ?>
                 </svg>

@@ -1,17 +1,17 @@
 <?php
 require __DIR__ . '/auth.php';
 require __DIR__ . '/baza.php';
-$_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+
 $blad = '';
 $nazwa = '';
 $cena = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nazwa = is_string($_POST['nazwa'] ?? null) ? trim($_POST['nazwa']) : '';
     $cena = is_string($_POST['cena'] ?? null) ? $_POST['cena'] : '';
-    $token = is_string($_POST['csrf'] ?? null) ? $_POST['csrf'] : '';
     $cenaLiczbowa = filter_var($cena, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     $akcja = $_POST['akcja'] ?? '';
-    if (!hash_equals($_SESSION['csrf'], $token)) {
+    if (!csrf_poprawny()) {
+        http_response_code(403);
         $blad = 'Nieprawidłowe żądanie. Spróbuj ponownie.';
     } elseif ($akcja === 'usun') {
         $id = is_string($_POST['id'] ?? null)
@@ -57,7 +57,7 @@ $uslugi = $pdo->query('SELECT id, nazwa, cena FROM uslugi ORDER BY nazwa')->fetc
         <div class="container gap-3">
             <a class="navbar-brand" href="index.php">Szprycha</a>
             <form method="post" action="wyloguj.php">
-                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                 <button type="submit" class="btn btn-outline-light">Wyloguj</button>
             </form>
         </div>
@@ -71,6 +71,8 @@ $uslugi = $pdo->query('SELECT id, nazwa, cena FROM uslugi ORDER BY nazwa')->fetc
         <p class="alert alert-success" role="status">Usługa dodana.</p>
         <?php elseif (($_GET['ok'] ?? '') === 'usunieto'): ?>
         <p class="alert alert-success" role="status">Usługa usunięta.</p>
+        <?php elseif (($_GET['ok'] ?? '') === 'edytowano'): ?>
+        <p class="alert alert-success" role="status">Usługa zaktualizowana.</p>
         <?php endif; ?>
         <div class="row g-4">
         <section class="col-lg-8" aria-labelledby="lista-uslug">
@@ -89,10 +91,11 @@ $uslugi = $pdo->query('SELECT id, nazwa, cena FROM uslugi ORDER BY nazwa')->fetc
                         <td><?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
                         <td class="text-end text-nowrap"><?= htmlspecialchars((string) $usluga['cena'], ENT_QUOTES, 'UTF-8') ?> zł</td>
                         <td>
+                            <a class="btn btn-sm btn-outline-secondary" href="edytuj.php?id=<?= (int) $usluga['id'] ?>" aria-label="Edytuj usługę: <?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">Edytuj</a>
                             <form method="post" action="admin.php" class="d-inline">
                                 <input type="hidden" name="akcja" value="usun">
                                 <input type="hidden" name="id" value="<?= (int) $usluga['id'] ?>">
-                                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Usuń usługę: <?= htmlspecialchars($usluga['nazwa'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">Usuń</button>
                             </form>
                         </td>
@@ -107,7 +110,7 @@ $uslugi = $pdo->query('SELECT id, nazwa, cena FROM uslugi ORDER BY nazwa')->fetc
             <h2 id="dodaj-usluge">Dodaj usługę</h2>
             <form method="post" action="admin.php" class="panel-form">
                 <input type="hidden" name="akcja" value="dodaj">
-                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
                 <label class="form-label" for="nazwa">Nazwa usługi</label>
                 <input class="form-control" id="nazwa" name="nazwa" required maxlength="100" value="<?= htmlspecialchars($nazwa, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
                 <label class="form-label" for="cena">Cena (zł)</label>
