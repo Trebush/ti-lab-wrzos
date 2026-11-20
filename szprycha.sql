@@ -13,13 +13,12 @@ CREATE TABLE IF NOT EXISTS uzytkownicy (
     haslo_hash TEXT NOT NULL
 );
 
-INSERT INTO uslugi (id, nazwa, cena)
-SELECT 1, 'Regulacja hamulców', 50 WHERE NOT EXISTS (SELECT 1 FROM uslugi WHERE id = 1);
-INSERT INTO uslugi (id, nazwa, cena)
-SELECT 2, 'Przegląd roweru', 120 WHERE NOT EXISTS (SELECT 1 FROM uslugi WHERE id = 2);
-INSERT INTO uslugi (id, nazwa, cena)
-SELECT 3, 'Serwis napędu', 90 WHERE NOT EXISTS (SELECT 1 FROM uslugi WHERE id = 3);
-INSERT INTO uslugi (id, nazwa, cena)
-SELECT 4, 'Centrowanie koła', 60 WHERE NOT EXISTS (SELECT 1 FROM uslugi WHERE id = 4);
+INSERT INTO uslugi (id, nazwa, cena, popularnosc) VALUES
+    (1, 'Regulacja hamulców', 50, 35),
+    (2, 'Przegląd roweru', 120, 80),
+    (3, 'Serwis napędu', 90, 50),
+    (4, 'Centrowanie koła', 60, 20)
+ON CONFLICT(id) DO UPDATE SET popularnosc = excluded.popularnosc
+WHERE uslugi.popularnosc = 0 AND uslugi.nazwa = excluded.nazwa;
 
 COMMIT;
