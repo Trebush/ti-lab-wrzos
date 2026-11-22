@@ -106,8 +106,9 @@ foreach ($cennik as $usluga) {
             <p id="blad-filtra" role="alert"><?= htmlspecialchars($bladFiltra, ENT_QUOTES, 'UTF-8') ?> Wyświetlono wszystkie usługi.</p>
             <?php endif; ?>
             <?php if ($cennik === []): ?>
-            <p>Brak usług spełniających podane kryteria.</p>
+            <p id="brak-uslug">Brak usług spełniających podane kryteria.</p>
             <?php endif; ?>
+            <p id="status" role="status" aria-live="polite" data-api-enabled="<?= array_key_exists('max', $_GET) ? 'false' : 'true' ?>"></p>
             <table class="price-table">
                 <thead>
                     <tr>
