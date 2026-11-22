@@ -108,7 +108,7 @@ foreach ($cennik as $usluga) {
             <?php if ($cennik === []): ?>
             <p id="brak-uslug">Brak usług spełniających podane kryteria.</p>
             <?php endif; ?>
-            <p id="status" role="status" aria-live="polite" data-api-enabled="<?= array_key_exists('max', $_GET) ? 'false' : 'true' ?>"></p>
+            <p id="status" role="status" aria-live="polite" data-max="<?= htmlspecialchars(is_string($max) ? $max : 'nieprawidlowy', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"></p>
             <table class="price-table">
                 <thead>
                     <tr>
@@ -128,10 +128,8 @@ foreach ($cennik as $usluga) {
             <figure class="price-chart">
                 <figcaption>Popularność usług</figcaption>
                 <p>Wykres obejmuje usługi widoczne w cenniku.</p>
-                <?php if ($cennik !== [] && $maksymalnaPopularnosc == 0): ?>
-                <p>Brak danych o popularności — wszystkie wartości wynoszą 0.</p>
-                <?php endif; ?>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 <?= max(1, count($cennik)) * 76 ?>" role="img" aria-labelledby="wykres-tytul wykres-opis">
+                <p id="zerowa-popularnosc"<?= $cennik !== [] && $maksymalnaPopularnosc == 0 ? '' : ' hidden' ?>>Brak danych o popularności — wszystkie wartości wynoszą 0.</p>
+                <svg id="wykres" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 <?= max(1, count($cennik)) * 76 ?>" role="img" aria-labelledby="wykres-tytul wykres-opis">
                     <title id="wykres-tytul">Popularność usług Szprychy</title>
                     <desc id="wykres-opis">Długości zielonych słupków odpowiadają popularności usług widocznych w cenniku. Najdłuższy słupek oznacza największą popularność. Przy każdej usłudze podano jej wartość.</desc>
                     <?php foreach ($cennik as $indeks => $usluga): ?>
